@@ -250,7 +250,7 @@ userId: 2
         )
         msg = {
             "name": "申购结果",
-            "value": responses.text,
+            "value": responses.json().get("data", {}).get("successDesc"),
         }
         return msg
 
@@ -264,14 +264,14 @@ userId: 2
             "YX_SUPPORT_WEBP": "1",
         }
         response = requests.post(
-            "https://h5.moutai519.com.cn/game/isolationPage/getUserEnergyAward",
+            url="https://h5.moutai519.com.cn/game/isolationPage/getUserEnergyAward",
             cookies=cookies,
             headers=self.headers,
             json={},
         )
         return {
             "name": "小茅运",
-            "value": response.text,
+            "value": response.json().get("message"),
         }
 
     def main(self):
@@ -283,6 +283,7 @@ userId: 2
         userId = self.check_item.get("userid")
         lat = self.check_item.get("lat")
         lng = self.check_item.get("lng")
+        item_codes = self.check_item.get("item_codes", self.ITEM_CODES)
         reserve_rule = self.check_item.get("reserve_rule", 0)
         msg = [
             {
@@ -298,7 +299,7 @@ userId: 2
         self.get_current_session_id()
         self.init_headers(user_id=userId, token=token, lng=lng, lat=lat)
         try:
-            for item in self.ITEM_CODES:
+            for item in item_codes:
                 max_shop_id = self.get_location_count(
                     province=province,
                     city=city,
