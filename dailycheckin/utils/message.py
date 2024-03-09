@@ -123,11 +123,20 @@ def message2qywxrobot(qywx_key, content):
 
 
 def message2qywxapp(
-    qywx_corpid, qywx_agentid, qywx_corpsecret, qywx_touser, qywx_media_id, content
+    qywx_corpid,
+    qywx_agentid,
+    qywx_corpsecret,
+    qywx_touser,
+    qywx_media_id,
+    qywx_origin,
+    content,
 ):
     print("企业微信应用消息推送开始")
+    bast_url = "https://qyapi.weixin.qq.com"
+    if qywx_origin:
+        bast_url = qywx_origin
     res = requests.get(
-        f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={qywx_corpid}&corpsecret={qywx_corpsecret}"
+        f"{bast_url}/cgi-bin/gettoken?corpid={qywx_corpid}&corpsecret={qywx_corpsecret}"
     )
     token = res.json().get("access_token", False)
     if qywx_media_id:
@@ -161,7 +170,7 @@ def message2qywxapp(
             },
         }
     requests.post(
-        url=f"https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}",
+        url=f"{bast_url}/cgi-bin/message/send?access_token={token}",
         data=json.dumps(data),
     )
     return
@@ -219,6 +228,7 @@ def push_message(content_list: list, notice_info: dict):
     qywx_corpsecret = notice_info.get("qywx_corpsecret")
     qywx_touser = notice_info.get("qywx_touser")
     qywx_media_id = notice_info.get("qywx_media_id")
+    qywx_origin = notice_info.get("qywx_origin")
     pushplus_token = notice_info.get("pushplus_token")
     pushplus_topic = notice_info.get("pushplus_topic")
     merge_push = notice_info.get("merge_push")
@@ -271,6 +281,7 @@ def push_message(content_list: list, notice_info: dict):
                     qywx_corpsecret=qywx_corpsecret,
                     qywx_touser=qywx_touser,
                     qywx_media_id=qywx_media_id,
+                    qywx_origin=qywx_origin,
                     content=message,
                 )
             except Exception as e:
